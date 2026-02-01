@@ -333,19 +333,19 @@ function FunBotUIPathMenu:_OnPathMenuRequest(p_Player, p_Data)
 			},
 			Left = {
 				{
-					Action = 'index_vehcile_1',
+					Action = 'index_vehicle_1',
 					Label = Language:I18N('Vehicle 1')
 				}, {
-				Action = 'index_vehcile_2',
+				Action = 'index_vehicle_2',
 				Label = Language:I18N('Vehicle 2')
 			}, {
-				Action = 'index_vehcile_3',
+				Action = 'index_vehicle_3',
 				Label = Language:I18N('Vehicle 3')
 			}, {
-				Action = 'index_vehcile_4',
+				Action = 'index_vehicle_4',
 				Label = Language:I18N('Vehicle 4')
 			}, {
-				Action = 'index_vehcile_5',
+				Action = 'index_vehicle_5',
 				Label = Language:I18N('Vehicle 5')
 			}
 			},
@@ -355,19 +355,19 @@ function FunBotUIPathMenu:_OnPathMenuRequest(p_Player, p_Data)
 			},
 			Right = {
 				{
-					Action = 'index_vehcile_6',
+					Action = 'index_vehicle_6',
 					Label = Language:I18N('Vehicle 6')
 				}, {
-				Action = 'index_vehcile_7',
+				Action = 'index_vehicle_7',
 				Label = Language:I18N('Vehicle 7')
 			}, {
-				Action = 'index_vehcile_8',
+				Action = 'index_vehicle_8',
 				Label = Language:I18N('Vehicle 8')
 			}, {
-				Action = 'index_vehcile_9',
+				Action = 'index_vehicle_9',
 				Label = Language:I18N('Vehicle 9')
 			}, {
-				Action = 'index_vehcile_10',
+				Action = 'index_vehicle_10',
 				Label = Language:I18N('Vehicle 10')
 			}
 			},
@@ -377,7 +377,7 @@ function FunBotUIPathMenu:_OnPathMenuRequest(p_Player, p_Data)
 			}
 		})
 		return
-	elseif string.find(request.action, 'index_vehcile_') then
+	elseif string.find(request.action, 'index_vehicle_') then
 		-- FILL THIS.
 		local s_Team = self.m_NavigaionPath[p_Player.onlineId][5]:split('_')[2]
 		local s_VehicleType = self.m_NavigaionPath[p_Player.onlineId][4]:split('_')[3]

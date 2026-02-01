@@ -404,16 +404,16 @@ class BotEditor {
                 case "base_ru_3":
                 case "base_ru_4":
                 case "base_ru_5":
-                case "index_vehcile_1":
-                case "index_vehcile_2":
-                case "index_vehcile_3":
-                case "index_vehcile_4":
-                case "index_vehcile_5":
-                case "index_vehcile_6":
-                case "index_vehcile_7":
-                case "index_vehcile_8":
-                case "index_vehcile_9":
-                case "index_vehcile_10":
+                case "index_vehicle_1":
+                case "index_vehicle_2":
+                case "index_vehicle_3":
+                case "index_vehicle_4":
+                case "index_vehicle_5":
+                case "index_vehicle_6":
+                case "index_vehicle_7":
+                case "index_vehicle_8":
+                case "index_vehicle_9":
+                case "index_vehicle_10":
                 case "set_vehicle_path_type":
                 case "vehicle_objective":
                 case "enter_exit_vehicle":

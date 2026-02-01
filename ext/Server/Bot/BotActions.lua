@@ -319,19 +319,20 @@ function Bot:_EnterVehicleEntity(p_Entity, p_PlayerIsDriver)
 		end
 	end
 
-	for seatIndex = 0, s_MaxEntries - 1 do
+	for l_IndexOfSeat = 0, s_MaxEntries - 1 do
+		local s_SeatIndex = l_IndexOfSeat
 		if s_VehicleData.Type == VehicleTypes.Gunship then
-			seatIndex = seatIndex + 1
+			s_SeatIndex = s_SeatIndex + 1
 		end
-		if p_Entity:GetPlayerInEntry(seatIndex) == nil or Globals.IsAirSuperiority or (Globals.MapHasDynamiJetSpawns and m_Vehicles:IsVehicleType(s_VehicleData, VehicleTypes.Plane)) then -- already in this seat in air superiority
-			self.m_Player:EnterVehicle(p_Entity, seatIndex)
+		if p_Entity:GetPlayerInEntry(s_SeatIndex) == nil or Globals.IsAirSuperiority or (Globals.MapHasDynamiJetSpawns and m_Vehicles:IsVehicleType(s_VehicleData, VehicleTypes.Plane)) then -- already in this seat in air superiority
+			self.m_Player:EnterVehicle(p_Entity, s_SeatIndex)
 			self._ExitVehicleHealth = PhysicsEntity(p_Entity).internalHealth * (Registry.VEHICLES.VEHICLE_EXIT_HEALTH / 100.0)
 			-- Get ID.
 			self.m_ActiveVehicle = s_VehicleData
 			self._ActiveVehicleWeaponSlot = 0
 			self:UpdateVehicleMovableId()
-			if seatIndex == 0 then
-				if seatIndex == s_MaxEntries - 1 then
+			if s_SeatIndex == 0 then
+				if s_SeatIndex == s_MaxEntries - 1 then
 					self._VehicleWaitTimer = 0.5 -- Always wait a short time to check for free start.
 					if Globals.IsAirSuperiority then
 						self._VehicleTakeoffTimer = 0.0
@@ -348,7 +349,7 @@ function Bot:_EnterVehicleEntity(p_Entity, p_PlayerIsDriver)
 			else
 				self._VehicleWaitTimer = 0.0
 
-				if seatIndex == s_MaxEntries - 1 then
+				if s_SeatIndex == s_MaxEntries - 1 then
 					-- Last seat taken: Disable vehicle and abort, wait for passengers.
 					local s_Driver = p_Entity:GetPlayerInEntry(0)
 

@@ -1773,7 +1773,7 @@ function NodeCollection:Find(p_Vec3Position, p_Tolerance)
 	local s_ClosestWaypointDist = p_Tolerance
 
 	for _, l_Waypoint in pairs(self._WaypointsByID) do
-		if l_Waypoint ~= nil and l_Waypoint.Position ~= nil and self:IsPathVisible(l_Waypoint.PathIndex) and
+		if l_Waypoint ~= nil and l_Waypoint.Position ~= nil and
 			self:IsPathVisible(l_Waypoint.PathIndex) then
 			if self:InRange(l_Waypoint, p_Vec3Position, p_Tolerance) then -- Faster check.
 				local s_Distance = l_Waypoint.Position:Distance(p_Vec3Position) -- Then do slower maths.
