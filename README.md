@@ -1,4 +1,5 @@
-Welcome to the fucked up bots repo. Vibe coded
+Welcome to the fucked up bots repo. Vibe coded.
+
 Forked from fun-bots.
 
 ### SUMMARY!
