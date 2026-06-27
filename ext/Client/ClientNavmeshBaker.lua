@@ -1035,8 +1035,24 @@ end
 
 function ClientNavmeshBaker:OnLoadCommit()
 	self.m_Loading = false
+
+	-- Derive the exact cell size from the loaded data so the overlay/editing grid lines
+	-- up with the cells, regardless of what the meta reported. The baker stores each cell
+	-- at world x = (gx + 0.5) * cellSize, so cellSize = x / (gx + 0.5).
+	for _, l_Cell in pairs(self.m_Cells) do
+		local s_Denom = l_Cell.gx + 0.5
+		if s_Denom ~= 0 then
+			local s_Derived = math.floor((l_Cell.x / s_Denom) * 1000 + 0.5) / 1000
+			if s_Derived > 0 then
+				self.m_ActiveCellSize = s_Derived
+			end
+		end
+		break
+	end
+
 	self.m_LastDrawCellKey = nil -- force overlay rebuild
-	m_Logger:Write('Navmesh loaded for editing: ' .. tostring(self.m_WalkableCount) .. ' cells.')
+	m_Logger:Write('Navmesh loaded for editing: ' .. tostring(self.m_WalkableCount) ..
+		' cells (cell size ' .. tostring(self.m_ActiveCellSize) .. ').')
 end
 
 -- Camera-forward raycast (same approach as the node editor) for the brush cursor.
@@ -1061,6 +1077,12 @@ function ClientNavmeshBaker:OnClientUpdateInput(p_DeltaTime)
 	self:_SyncEditorState()
 	if not self.m_EditorActive then
 		return
+	end
+
+	-- Pressing F12 opens a menu - always drop edit mode so the editor never fights it.
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_F12) then
+		self.m_EditMode = false
+		self:_EndStroke()
 	end
 
 	-- While the WebUI holds the cursor (F12 menu open), do not touch input - so the
@@ -1278,8 +1300,13 @@ function ClientNavmeshBaker:_BoxClick()
 	local s_MaxX = math.max(self.m_BoxCornerA.x, self.m_BrushHit.x)
 	local s_MinZ = math.min(self.m_BoxCornerA.z, self.m_BrushHit.z)
 	local s_MaxZ = math.max(self.m_BoxCornerA.z, self.m_BrushHit.z)
+	-- Constrain to the vertical band of the two corners (+/- margin), so the box only
+	-- erases cells near the surface you drew it on - not floors above/below you can't see.
+	local s_MinY = math.min(self.m_BoxCornerA.y, self.m_BrushHit.y) - 4.0
+	local s_MaxY = math.max(self.m_BoxCornerA.y, self.m_BrushHit.y) + 4.0
 	for l_Key, l_Cell in pairs(self.m_Cells) do
-		if l_Cell.x >= s_MinX and l_Cell.x <= s_MaxX and l_Cell.z >= s_MinZ and l_Cell.z <= s_MaxZ then
+		if l_Cell.x >= s_MinX and l_Cell.x <= s_MaxX and l_Cell.z >= s_MinZ and l_Cell.z <= s_MaxZ
+			and l_Cell.y >= s_MinY and l_Cell.y <= s_MaxY then
 			s_Stroke.removed[l_Key] = l_Cell
 		end
 	end
@@ -1369,9 +1396,10 @@ function ClientNavmeshBaker:_DrawEditorHud()
 	l_Line(string.format('edit: %s   tool: %s   brush: %.0f m',
 		self.m_EditMode and 'ON' or 'off', self.m_Tool, self.m_BrushRadius))
 	l_Line(string.format('cells: %d   unsaved edits: %d', self.m_WalkableCount, self.m_UnsavedEdits), s_Muted)
-	-- Diagnostics (helps confirm the brush is reading aim + LMB correctly).
-	l_Line(string.format('aim: %s   LMB: %s', self.m_BrushHit and 'hit' or 'none',
-		self.m_FireLevel > 0 and 'DOWN' or 'up'), s_Muted)
+	-- Diagnostics (helps confirm the brush is reading aim + LMB, and the overlay draws).
+	l_Line(string.format('aim: %s   LMB: %s   drawn: %d   csize: %.2f',
+		self.m_BrushHit and 'hit' or 'none', self.m_FireLevel > 0 and 'DOWN' or 'up',
+		#self.m_DrawNodes, self:_CellSize()), s_Muted)
 	s_Y = s_Y + 5
 	l_Line('ALT edit  |  LMB apply  |  1/2/3 paint/erase/box', s_Muted)
 	l_Line('numpad -/+ brush  |  N navmesh  |  B waypoints', s_Muted)
