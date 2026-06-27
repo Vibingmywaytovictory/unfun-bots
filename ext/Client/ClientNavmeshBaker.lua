@@ -1025,9 +1025,15 @@ function ClientNavmeshBaker:OnLoadBatch(p_Batch)
 	end
 	for l_Index = 1, #p_Batch do
 		local l_Cell = p_Batch[l_Index]
-		local s_Key = self:_CellKey(l_Cell.gx, l_Cell.gz, l_Cell.gy)
+		-- Coerce grid coords to integers: they come back from SQL as floats (17.0), which
+		-- would make string keys like "17.0:26.0:66.0" that never match the integer keys
+		-- the overlay/brush compute via math.floor ("17:26:66").
+		local s_Gx = math.floor(l_Cell.gx + 0.5)
+		local s_Gz = math.floor(l_Cell.gz + 0.5)
+		local s_Gy = math.floor(l_Cell.gy + 0.5)
+		local s_Key = self:_CellKey(s_Gx, s_Gz, s_Gy)
 		if self.m_Cells[s_Key] == nil then
-			self.m_Cells[s_Key] = { x = l_Cell.x, y = l_Cell.y, z = l_Cell.z, gx = l_Cell.gx, gz = l_Cell.gz, gy = l_Cell.gy }
+			self.m_Cells[s_Key] = { x = l_Cell.x, y = l_Cell.y, z = l_Cell.z, gx = s_Gx, gz = s_Gz, gy = s_Gy }
 			self.m_WalkableCount = self.m_WalkableCount + 1
 		end
 	end
