@@ -1118,13 +1118,14 @@ function ClientNavmeshBaker:OnClientUpdateInput(p_DeltaTime)
 	if InputManager:IsKeyDown(InputDeviceKeys.IDK_LeftControl) and InputManager:WentKeyDown(InputDeviceKeys.IDK_Z) then
 		self:_Undo()
 	end
-	-- Number row (the tool keys 1/2/3 register fine in-game, unlike letter/function keys).
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_4) then self:SaveBake() end
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_5) then self:RequestClientLoad() end
-	-- 6 turns the editor off (the "off button"). Done locally for instant effect and
+	-- Numpad keys: not bound to BF3 actions (unlike top-row 4/5/6 which get consumed),
+	-- and confirmed working in-game (same as the numpad -/+ brush keys).
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_Numpad7) then self:SaveBake() end
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_Numpad8) then self:RequestClientLoad() end
+	-- Numpad 9 turns the editor off (the "off button"). Done locally for instant effect and
 	-- persisted via the settings manager so it stays off after a rejoin - and so the F12
 	-- menu is reachable again.
-	if InputManager:WentKeyDown(InputDeviceKeys.IDK_6) then
+	if InputManager:WentKeyDown(InputDeviceKeys.IDK_Numpad9) then
 		Config.NavmeshEditor = false
 		NetEvents:SendLocal('ConsoleCommands:SetConfig', 'NavmeshEditor', 'false')
 	end
@@ -1417,7 +1418,7 @@ function ClientNavmeshBaker:_DrawEditorHud()
 	s_Y = s_Y + 5
 	l_Line('ALT edit  |  LMB apply  |  1/2/3 paint/erase/box', s_Muted)
 	l_Line('numpad -/+ brush  |  N navmesh  |  B waypoints  |  Ctrl+Z undo', s_Muted)
-	l_Line('4 SAVE  |  5 load from db  |  6 EXIT editor', s_Accent)
+	l_Line('numpad 7 SAVE  |  numpad 8 load  |  numpad 9 EXIT editor', s_Accent)
 end
 
 -- =============================================
