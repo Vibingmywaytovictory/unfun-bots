@@ -1127,18 +1127,17 @@ function ClientNavmeshBaker:OnClientUpdateInput(p_DeltaTime)
 		NetEvents:SendLocal('ConsoleCommands:SetConfig', 'NavmeshEditor', 'false')
 	end
 
-	-- DIAGNOSTIC: scan every letter key with WentKeyDown (proven to work for N/B/1/2/3)
-	-- and remember the last one that registered. Press letters and watch the HUD "last
-	-- key" line to find which keys BF3 does not consume on this setup. N or B should show
-	-- up immediately (they work) - that confirms the test itself is reading input.
-	local s_Letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-	for l_I = 1, #s_Letters do
-		local s_C = s_Letters:sub(l_I, l_I)
-		local s_KeyId = InputDeviceKeys['IDK_' .. s_C]
-		if s_KeyId ~= nil and InputManager:WentKeyDown(s_KeyId) then
-			self.m_LastKey = s_C
-		end
-	end
+	-- DIAGNOSTIC: live held-state of candidate keys so we can find ones that register
+	-- on this machine. Hold each and watch the "key test" line in the HUD.
+	self.m_DbgKeys = {
+		H = InputManager:IsKeyDown(InputDeviceKeys.IDK_H),
+		U = InputManager:IsKeyDown(InputDeviceKeys.IDK_U),
+		O = InputManager:IsKeyDown(InputDeviceKeys.IDK_O),
+		J = InputManager:IsKeyDown(InputDeviceKeys.IDK_J),
+		K = InputManager:IsKeyDown(InputDeviceKeys.IDK_K),
+		L = InputManager:IsKeyDown(InputDeviceKeys.IDK_L),
+		M = InputManager:IsKeyDown(InputDeviceKeys.IDK_M),
+	}
 	-- Note: the brush raycast + LMB apply are handled in _UpdateEditor (pre-sim pass).
 	-- Raycasts do not resolve from the Client:UpdateInput event.
 end
@@ -1429,8 +1428,11 @@ function ClientNavmeshBaker:_DrawEditorHud()
 	l_Line('ALT edit  |  LMB apply  |  1/2/3 paint/erase/box', s_Muted)
 	l_Line('numpad -/+ brush  |  N navmesh  |  B waypoints  |  Ctrl+Z undo', s_Muted)
 	l_Line('H SAVE  |  U load from db  |  O EXIT editor', s_Accent)
-	-- Press letter keys; the last one that registered shows here. N/B should appear.
-	l_Line('KEY TEST - press letters, last that registered: ' .. (self.m_LastKey or 'none'), s_Accent)
+	-- Live key test: hold a key, see if it shows "1". Tells us which keys register here.
+	local s_Dbg = self.m_DbgKeys or {}
+	l_Line(string.format('key test (hold): H%d U%d O%d J%d K%d L%d M%d',
+		s_Dbg.H and 1 or 0, s_Dbg.U and 1 or 0, s_Dbg.O and 1 or 0,
+		s_Dbg.J and 1 or 0, s_Dbg.K and 1 or 0, s_Dbg.L and 1 or 0, s_Dbg.M and 1 or 0), s_Muted)
 end
 
 -- =============================================
