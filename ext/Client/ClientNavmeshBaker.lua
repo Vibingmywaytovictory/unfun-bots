@@ -135,7 +135,7 @@ function ClientNavmeshBaker:OnRegisterEvents()
 	end
 
 	Console:Register('BakeNavmesh',
-		'<start|stop|save|clear|status> - Control the offline navmesh baker', self, self.OnConsoleCommand)
+		'<start|stop|save|load|clear|exit|status> - Control the offline navmesh baker / editor', self, self.OnConsoleCommand)
 
 	-- Re-use the node editor's data feed to seed the bake from existing waypoints.
 	-- VEXT allows multiple subscribers to the same NetEvent, so this is additive.
@@ -192,14 +192,27 @@ function ClientNavmeshBaker:OnConsoleCommand(p_Args)
 	elseif s_Action == 'stop' then
 		self:StopBake()
 	elseif s_Action == 'save' then
+		-- Saves whatever is in memory, including brush/box edits made in the editor
+		-- (they mutate the same cell map the bake fills), so this is "save edited mesh".
 		self:SaveBake()
+	elseif s_Action == 'load' then
+		-- Pull the saved navmesh from the server into the editor (same path the editor
+		-- uses on entry). Lets you reload after edits, or load without relying on keybinds.
+		self:RequestClientLoad()
 	elseif s_Action == 'clear' then
 		self:ResetBake()
 		m_Logger:Write('Navmesh bake cleared.')
+	elseif s_Action == 'exit' then
+		-- Turn the editor off from the console - a reliable alternative to the F12 toggle
+		-- and the in-editor keybind. Done locally for instant effect and persisted via the
+		-- settings manager so it stays off after a rejoin.
+		Config.NavmeshEditor = false
+		NetEvents:SendLocal('ConsoleCommands:SetConfig', 'NavmeshEditor', 'false')
+		m_Logger:Write('Navmesh editor disabled.')
 	elseif s_Action == 'status' then
 		self:PrintStatus()
 	else
-		m_Logger:Write('Usage: BakeNavmesh <start|stop|save|clear|status>')
+		m_Logger:Write('Usage: BakeNavmesh <start|stop|save|load|clear|exit|status>')
 	end
 end
 
@@ -1115,7 +1128,7 @@ function ClientNavmeshBaker:OnClientUpdateInput(p_DeltaTime)
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_Add) then self:_AdjustBrush(Registry.NAVMESH.BRUSH_STEP) end
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_N) then Config.DrawNavmesh = not Config.DrawNavmesh end
 	if InputManager:WentKeyDown(InputDeviceKeys.IDK_B) then self:_ToggleWaypoints() end
-	if InputManager:IsKeyDown(InputDeviceKeys.IDK_LeftControl) and InputManager:WentKeyDown(InputDeviceKeys.IDK_Z) then
+	if InputManager:IsKeyDown(InputDeviceKeys.IDK_LeftCtrl) and InputManager:WentKeyDown(InputDeviceKeys.IDK_Z) then
 		self:_Undo()
 	end
 	-- Letter keys (function keys did not register in-game).
